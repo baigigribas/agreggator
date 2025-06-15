@@ -35,7 +35,7 @@ Think of it like a search engine specifically for cars and apartments/houses
 - **PostgreSQL**: A database to store all the listings and user data
 - **Python**: Programming language for web scraping and data processing
 
-## File Structure
+## File Structure - to be updated
 
 ```
 src/
