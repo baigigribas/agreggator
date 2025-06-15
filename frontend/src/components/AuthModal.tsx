@@ -8,10 +8,11 @@ interface AuthModalProps {
   onClose: () => void; // Function to call when closing modal
   mode: 'login' | 'register'; // Whether showing login or registration form
   onModeChange: (mode: 'login' | 'register') => void; // Function to switch between login/register
+  onAuthSuccess: (userData: { name: string; email: string }) => void; // Function to call on successful auth
 }
 
 // Authentication modal component - popup for user login and registration
-export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, mode, onModeChange, onAuthSuccess }: AuthModalProps) {
   
   // Store form data in state
   const [formData, setFormData] = useState({
@@ -26,6 +27,9 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
   
   // Store validation error messages
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Loading state for form submission
+  const [isLoading, setIsLoading] = useState(false);
 
   // Function called when user types in any input field
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,14 +76,56 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
   };
 
   // Function called when form is submitted
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent default form submission
     
-    if (validateForm()) {
-      // If form is valid, handle authentication logic here
-      console.log('Form submitted:', formData);
-      onClose(); // Close the modal
+    if (!validateForm()) {
+      return; // Stop if validation fails
     }
+
+    setIsLoading(true);
+
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // For demo purposes, we'll simulate successful authentication
+      // In a real app, you would make an API call to your backend here
+      const userData = {
+        name: mode === 'register' ? formData.name : 'John Doe', // Use provided name or default
+        email: formData.email
+      };
+
+      // Call the success handler with user data
+      onAuthSuccess(userData);
+
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+      });
+      setErrors({});
+      
+    } catch (error) {
+      // Handle authentication errors
+      setErrors({ general: 'Authentication failed. Please try again.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to reset form when switching modes
+  const handleModeChange = (newMode: 'login' | 'register') => {
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    });
+    setErrors({});
+    onModeChange(newMode);
   };
 
   // Don't render anything if modal is not open
@@ -101,10 +147,18 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
             <button
               onClick={onClose} // Close modal when clicked
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              disabled={isLoading}
             >
               <X className="h-5 w-5" />
             </button>
           </div>
+
+          {/* Show general error if exists */}
+          {errors.general && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{errors.general}</p>
+            </div>
+          )}
 
           {/* Authentication form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -123,7 +177,8 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    disabled={isLoading}
+                    className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed ${
                       errors.name ? 'border-red-500' : 'border-gray-300' // Red border if error
                     }`}
                     placeholder="Enter your full name"
@@ -147,7 +202,8 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  disabled={isLoading}
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed ${
                     errors.email ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Enter your email"
@@ -169,7 +225,8 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  disabled={isLoading}
+                  className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed ${
                     errors.password ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Enter your password"
@@ -178,7 +235,8 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  disabled={isLoading}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:cursor-not-allowed"
                 >
                   {/* Show different icon based on password visibility */}
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -200,7 +258,8 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    disabled={isLoading}
+                    className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed ${
                       errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Confirm your password"
@@ -213,10 +272,18 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
             {/* Submit button */}
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors duration-200 font-medium flex items-center justify-center"
             >
-              {/* Show different text based on mode */}
-              {mode === 'login' ? 'Sign In' : 'Create Account'}
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  {mode === 'login' ? 'Signing In...' : 'Creating Account...'}
+                </>
+              ) : (
+                /* Show different text based on mode */
+                mode === 'login' ? 'Sign In' : 'Create Account'
+              )}
             </button>
           </form>
 
@@ -225,8 +292,9 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthModalProp
             <p className="text-sm text-gray-600">
               {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
               <button
-                onClick={() => onModeChange(mode === 'login' ? 'register' : 'login')} // Switch mode
-                className="ml-1 text-blue-600 hover:text-blue-700 font-medium"
+                onClick={() => handleModeChange(mode === 'login' ? 'register' : 'login')} // Switch mode
+                disabled={isLoading}
+                className="ml-1 text-blue-600 hover:text-blue-700 font-medium disabled:cursor-not-allowed"
               >
                 {mode === 'login' ? 'Sign up' : 'Sign in'}
               </button>

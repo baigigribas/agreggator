@@ -1,10 +1,12 @@
 import React, { useState, useMemo } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
 import { TabNavigation } from './components/TabNavigation';
 import { FilterPanel } from './components/FilterPanel';
 import { ListingCard } from './components/ListingCard';
 import { AuthModal } from './components/AuthModal';
+import { ProfilePage } from './components/ProfilePage';
 import { mockListings, mockNotifications } from './data/mockData';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { Listing } from './types';
@@ -21,7 +23,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   
   // Track which tab is currently active (all listings, cars only, or real estate only)
-  const [activeTab, setActiveTab] = useState<'all' | 'cars' | 'real-estate'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'car' | 'real-estate'>('all');
   
   // Control whether the filter panel is visible
   const [showFilters, setShowFilters] = useState(false);
@@ -34,6 +36,10 @@ function App() {
   
   // Track whether user wants to login or register
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+
+  // Authentication state - track if user is logged in and their info
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useLocalStorage<{ name: string; email: string; phone?: string; bio?: string } | null>('user', null);
 
   // Filter listings based on search, tab, and applied filters
   // useMemo means this calculation only runs when the dependencies change (optimization)
@@ -105,6 +111,30 @@ function App() {
     setAppliedFilters(filters);
   };
 
+  // Function to show authentication modal
+  const handleShowAuth = (mode: 'login' | 'register') => {
+    setAuthMode(mode);
+    setShowAuthModal(true);
+  };
+
+  // Function to handle successful authentication
+  const handleAuthSuccess = (userData: { name: string; email: string }) => {
+    setIsAuthenticated(true);
+    setUser(userData);
+    setShowAuthModal(false);
+  };
+
+  // Function to handle logout
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setUser(null);
+  };
+
+  // Function to update user profile
+  const handleUpdateProfile = (updatedUser: { name: string; email: string; phone?: string; bio?: string }) => {
+    setUser(updatedUser);
+  };
+
   // Calculate dashboard statistics
   // useMemo optimizes this so it only recalculates when listings change
   const stats = useMemo(() => {
@@ -145,20 +175,13 @@ function App() {
   // Count listings for each tab
   const tabCounts = {
     all: listings.length,
-    cars: listings.filter(l => l.type === 'car').length,
+    car: listings.filter(l => l.type === 'car').length,
     realEstate: listings.filter(l => l.type === 'real-estate').length
   };
 
-  // Render the user interface
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header component with search and navigation */}
-      <Header
-        onSearchChange={setSearchQuery} // Pass function to handle search changes
-        onShowFilters={() => setShowFilters(true)} // Pass function to show filter panel
-        notificationCount={mockNotifications.filter(n => !n.read).length} // Count unread notifications
-      />
-
+  // Main listings page component
+  const ListingsPage = () => (
+    <>
       {/* Main content area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Dashboard showing statistics */}
@@ -174,7 +197,7 @@ function App() {
         {/* Header showing results count and clear filters button */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
-            {filteredListings.length} {activeTab === 'all' ? 'Listings' : activeTab === 'cars' ? 'Cars' : 'Properties'} Found
+            {filteredListings.length} {activeTab === 'all' ? 'Listings' : activeTab === 'car' ? 'Cars' : 'Properties'} Found
           </h2>
           
           {/* Show clear filters button only if filters are applied */}
@@ -209,6 +232,37 @@ function App() {
           </div>
         )}
       </main>
+    </>
+  );
+
+  // Render the user interface
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header component with search and navigation */}
+      <Header
+        onSearchChange={setSearchQuery} // Pass function to handle search changes
+        onShowFilters={() => setShowFilters(true)} // Pass function to show filter panel
+        notificationCount={mockNotifications.filter(n => !n.read).length} // Count unread notifications
+        onShowAuth={handleShowAuth} // Pass function to show auth modal
+        isAuthenticated={isAuthenticated} // Pass authentication status
+        user={user} // Pass user data
+        onLogout={handleLogout} // Pass logout function
+      />
+
+      {/* Main content with routing */}
+      <Routes>
+        <Route path="/" element={<ListingsPage />} />
+        <Route 
+          path="/profile" 
+          element={
+            <ProfilePage 
+              user={user} 
+              onUpdateProfile={handleUpdateProfile}
+              isAuthenticated={isAuthenticated}
+            />
+          } 
+        />
+      </Routes>
 
       {/* Filter panel (slides in from right when opened) */}
       <FilterPanel
@@ -223,6 +277,7 @@ function App() {
         onClose={() => setShowAuthModal(false)} // Function to close modal
         mode={authMode} // Whether showing login or register form
         onModeChange={setAuthMode} // Function to switch between login/register
+        onAuthSuccess={handleAuthSuccess} // Function to handle successful authentication
       />
     </div>
   );

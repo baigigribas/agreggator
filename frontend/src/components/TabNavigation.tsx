@@ -4,12 +4,12 @@ import { Car, Home, SaveAll as All } from 'lucide-react';
 
 // Define what props this component expects
 interface TabNavigationProps {
-  activeTab: 'all' | 'cars' | 'real-estate'; // Which tab is currently selected
-  onTabChange: (tab: 'all' | 'cars' | 'real-estate') => void; // Function to call when tab changes
-  counts: { all: number; cars: number; realEstate: number }; // Number of listings in each category
+  activeTab: 'all' | 'car' | 'real-estate'; // Which tab is currently selected
+  onTabChange: (tab: 'all' | 'car' | 'real-estate') => void; // Function to call when tab changes
+  counts: { all: number; car: number; realEstate: number }; // Number of listings in each category
 }
 
-// Tab navigation component - allows switching between all listings, cars only, or real estate only
+// Tab navigation component - allows switching between all listings, car only, or real estate only
 export function TabNavigation({ activeTab, onTabChange, counts }: TabNavigationProps) {
   
   // Define the tabs with their properties
@@ -21,10 +21,10 @@ export function TabNavigation({ activeTab, onTabChange, counts }: TabNavigationP
       count: counts.all // Number of listings to show in badge
     },
     { 
-      id: 'cars' as const, 
+      id: 'car' as const, 
       label: 'Cars', 
       icon: Car, 
-      count: counts.cars 
+      count: counts.car 
     },
     { 
       id: 'real-estate' as const, 
