@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   User, 
@@ -12,13 +12,15 @@ import {
   EyeOff,
   Camera,
   MapPin,
-  Calendar
+  Calendar,
+  Upload,
+  X
 } from 'lucide-react';
 
 // Define what props this component expects
 interface ProfilePageProps {
-  user: { name: string; email: string; phone?: string; bio?: string } | null;
-  onUpdateProfile: (userData: { name: string; email: string; phone?: string; bio?: string }) => void;
+  user: { name: string; email: string; phone?: string; bio?: string; avatar?: string } | null;
+  onUpdateProfile: (userData: { name: string; email: string; phone?: string; bio?: string; avatar?: string }) => void;
   isAuthenticated: boolean;
 }
 
@@ -29,7 +31,8 @@ export function ProfilePage({ user, onUpdateProfile, isAuthenticated }: ProfileP
     name: user?.name || '',
     email: user?.email || '',
     phone: user?.phone || '',
-    bio: user?.bio || ''
+    bio: user?.bio || '',
+    avatar: user?.avatar || ''
   });
 
   // State for password change form
@@ -55,6 +58,11 @@ export function ProfilePage({ user, onUpdateProfile, isAuthenticated }: ProfileP
   const [successMessage, setSuccessMessage] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // State for profile photo upload
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Handle input changes for profile form
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -74,6 +82,85 @@ export function ProfilePage({ user, onUpdateProfile, isAuthenticated }: ProfileP
     // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  // Handle profile photo selection
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setErrors(prev => ({ ...prev, photo: 'Please select a valid image file (JPEG, PNG, or WebP)' }));
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      setErrors(prev => ({ ...prev, photo: 'Image size must be less than 5MB' }));
+      return;
+    }
+
+    // Clear any previous errors
+    setErrors(prev => ({ ...prev, photo: '' }));
+
+    // Create preview URL
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      setPhotoPreview(result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handle profile photo upload
+  const handlePhotoUpload = async () => {
+    if (!photoPreview) return;
+
+    setIsUploadingPhoto(true);
+    
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // In a real app, you would upload the file to your server or cloud storage
+      // For demo purposes, we'll just use the preview URL
+      setFormData(prev => ({ ...prev, avatar: photoPreview }));
+      setPhotoPreview(null);
+      setSuccessMessage('Profile photo updated successfully!');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      setErrors({ photo: 'Failed to upload photo. Please try again.' });
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
+  // Cancel photo upload
+  const handleCancelPhotoUpload = () => {
+    setPhotoPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    setErrors(prev => ({ ...prev, photo: '' }));
+  };
+
+  // Trigger file input click
+  const handlePhotoButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // Remove current profile photo
+  const handleRemovePhoto = () => {
+    setFormData(prev => ({ ...prev, avatar: '' }));
+    setPhotoPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -247,16 +334,101 @@ export function ProfilePage({ user, onUpdateProfile, isAuthenticated }: ProfileP
               {/* Avatar */}
               <div className="flex flex-col items-center">
                 <div className="relative">
-                  <div className="h-32 w-32 bg-gray-200 rounded-full flex items-center justify-center">
-                    <User className="h-16 w-16 text-gray-400" />
+                  <div className="h-32 w-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                    {formData.avatar || photoPreview ? (
+                      <img
+                        src={photoPreview || formData.avatar}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="h-16 w-16 text-gray-400" />
+                    )}
                   </div>
-                  <button className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
+                  
+                  {/* Camera button */}
+                  <button
+                    onClick={handlePhotoButtonClick}
+                    disabled={isUploadingPhoto}
+                    className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
+                  >
                     <Camera className="h-4 w-4" />
                   </button>
                 </div>
+
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  onChange={handlePhotoSelect}
+                  className="hidden"
+                />
+
+                {/* Photo upload controls */}
+                {photoPreview ? (
+                  <div className="mt-4 w-full space-y-2">
+                    <button
+                      onClick={handlePhotoUpload}
+                      disabled={isUploadingPhoto}
+                      className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                    >
+                      {isUploadingPhoto ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload Photo
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={handleCancelPhotoUpload}
+                      disabled={isUploadingPhoto}
+                      className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mt-4 w-full space-y-2">
+                    <button
+                      onClick={handlePhotoButtonClick}
+                      className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                    >
+                      <Camera className="h-4 w-4 mr-2" />
+                      {formData.avatar ? 'Change Photo' : 'Upload Photo'}
+                    </button>
+                    
+                    {formData.avatar && (
+                      <button
+                        onClick={handleRemovePhoto}
+                        className="w-full bg-red-50 text-red-600 py-2 px-4 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center"
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Remove Photo
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Photo upload instructions */}
                 <p className="text-sm text-gray-500 mt-4 text-center">
-                  Click the camera icon to upload a new profile picture
+                  {photoPreview ? (
+                    'Click "Upload Photo" to save your new profile picture'
+                  ) : (
+                    'Upload a photo (JPEG, PNG, or WebP, max 5MB)'
+                  )}
                 </p>
+
+                {/* Photo error message */}
+                {errors.photo && (
+                  <p className="text-red-500 text-xs mt-2 text-center">{errors.photo}</p>
+                )}
               </div>
             </div>
 
@@ -411,7 +583,8 @@ export function ProfilePage({ user, onUpdateProfile, isAuthenticated }: ProfileP
                           name: user?.name || '',
                           email: user?.email || '',
                           phone: user?.phone || '',
-                          bio: user?.bio || ''
+                          bio: user?.bio || '',
+                          avatar: user?.avatar || ''
                         });
                         setErrors({});
                       }}

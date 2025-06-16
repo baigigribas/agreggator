@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 // Import icons from lucide-react library
-import { Search, Bell, User, Heart, Filter, Settings, LogIn, UserPlus } from 'lucide-react';
+import { Search, Bell, User, Heart, Filter, LogIn, UserPlus } from 'lucide-react';
 
 // Define what props (inputs) this component expects
 interface HeaderProps {
@@ -154,16 +154,9 @@ export function Header({
                         Profile
                       </Link>
                       <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                        My Filters
-                      </a>
-                      <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                         Saved Listings
                       </a>
                       <hr className="my-2" />
-                      <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                        <Settings className="h-4 w-4 inline mr-2" />
-                        Settings
-                      </a>
                       <button 
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"

@@ -5,6 +5,7 @@ import { Dashboard } from './components/Dashboard';
 import { TabNavigation } from './components/TabNavigation';
 import { FilterPanel } from './components/FilterPanel';
 import { ListingCard } from './components/ListingCard';
+import { ListingDetail } from './components/ListingDetail';
 import { AuthModal } from './components/AuthModal';
 import { ProfilePage } from './components/ProfilePage';
 import { mockListings, mockNotifications } from './data/mockData';
@@ -39,7 +40,7 @@ function App() {
 
   // Authentication state - track if user is logged in and their info
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useLocalStorage<{ name: string; email: string; phone?: string; bio?: string } | null>('user', null);
+  const [user, setUser] = useLocalStorage<{ name: string; email: string; phone?: string; bio?: string; avatar?: string } | null>('user', null);
 
   // Filter listings based on search, tab, and applied filters
   // useMemo means this calculation only runs when the dependencies change (optimization)
@@ -131,7 +132,7 @@ function App() {
   };
 
   // Function to update user profile
-  const handleUpdateProfile = (updatedUser: { name: string; email: string; phone?: string; bio?: string }) => {
+  const handleUpdateProfile = (updatedUser: { name: string; email: string; phone?: string; bio?: string; avatar?: string }) => {
     setUser(updatedUser);
   };
 
@@ -252,6 +253,15 @@ function App() {
       {/* Main content with routing */}
       <Routes>
         <Route path="/" element={<ListingsPage />} />
+        <Route 
+          path="/listing/:id" 
+          element={
+            <ListingDetail 
+              listings={listings} 
+              onFavorite={handleFavorite}
+            />
+          } 
+        />
         <Route 
           path="/profile" 
           element={
