@@ -5,6 +5,7 @@ import { Dashboard } from './components/Dashboard';
 import { TabNavigation } from './components/TabNavigation';
 import { FilterPanel } from './components/FilterPanel';
 import { ListingCard } from './components/ListingCard';
+import { ListingDetail } from './components/ListingDetail';
 import { AuthModal } from './components/AuthModal';
 import { ProfilePage } from './components/ProfilePage';
 import { mockListings, mockNotifications } from './data/mockData';
@@ -252,6 +253,15 @@ function App() {
       {/* Main content with routing */}
       <Routes>
         <Route path="/" element={<ListingsPage />} />
+        <Route 
+          path="/listing/:id" 
+          element={
+            <ListingDetail 
+              listings={listings} 
+              onFavorite={handleFavorite}
+            />
+          } 
+        />
         <Route 
           path="/profile" 
           element={
