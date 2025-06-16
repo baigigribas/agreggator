@@ -40,7 +40,7 @@ function App() {
 
   // Authentication state - track if user is logged in and their info
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useLocalStorage<{ name: string; email: string; phone?: string; bio?: string } | null>('user', null);
+  const [user, setUser] = useLocalStorage<{ name: string; email: string; phone?: string; bio?: string; avatar?: string } | null>('user', null);
 
   // Filter listings based on search, tab, and applied filters
   // useMemo means this calculation only runs when the dependencies change (optimization)
@@ -132,7 +132,7 @@ function App() {
   };
 
   // Function to update user profile
-  const handleUpdateProfile = (updatedUser: { name: string; email: string; phone?: string; bio?: string }) => {
+  const handleUpdateProfile = (updatedUser: { name: string; email: string; phone?: string; bio?: string; avatar?: string }) => {
     setUser(updatedUser);
   };
 
