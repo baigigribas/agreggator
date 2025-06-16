@@ -1,11 +1,10 @@
 // Import type definitions to ensure data matches expected structure
 import { Listing, Filter, Notification } from '../types';
 
-// Sample listings data - this simulates what would come from your database
-// In the real application, this data would be scraped from ss.com, city24.lv, etc.
+// Sample listings data
 export const mockListings: Listing[] = [
   {
-    id: '1', // Unique identifier for this listing
+    id: '1', // Unique identifier
     title: 'BMW X5 3.0d xDrive', // Listing title
     price: 25000, // Price in the specified currency
     currency: 'EUR', // Currency code

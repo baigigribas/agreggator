@@ -5,9 +5,14 @@ import { TabNavigation } from './components/TabNavigation';
 import { FilterPanel } from './components/FilterPanel';
 import { ListingCard } from './components/ListingCard';
 import { AuthModal } from './components/AuthModal';
-import { mockListings, mockNotifications } from './data/mockData';
+
+import { mockNotifications } from './data/mockData';
+import { fetchListings } from './services/listingService';
+
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { Listing } from './types';
+import { useEffect } from 'react';
+import { Notification } from './types';
 
 // This is the main component that controls the entire application
 function App() {
@@ -15,7 +20,10 @@ function App() {
   
   // Store listings in browser's local storage so they persist between sessions
   // useLocalStorage is a custom hook that saves data locally
-  const [listings, setListings] = useLocalStorage<Listing[]>('listings', mockListings);
+  const [listings, setListings] = useLocalStorage<Listing[]>('listings', []);
+  useEffect(() => {
+  fetchListings().then(setListings);
+  }, []);
   
   // Track what the user is searching for
   const [searchQuery, setSearchQuery] = useState('');
