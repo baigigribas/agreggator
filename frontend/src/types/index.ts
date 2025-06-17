@@ -12,7 +12,7 @@ export interface User {
 
 // Listing structure - represents a car or real estate listing
 export interface Listing {
-  id: string; // Unique identifier
+  id: number; // Use number for consistency
   title: string; // Listing title/name
   price: number; // Price as a number
   currency: string; // Currency code (EUR, USD, etc.)
@@ -25,6 +25,7 @@ export interface Listing {
   datePosted: string; // When listing was posted (date string)
   source: string; // Which website this came from
   isFavorite?: boolean; // Optional - whether user favorited this
+  favoriteId?: number;
   priceHistory?: Array<{ // Optional - price change history
     price: number; // Previous price
     date: string; // When price was this amount
@@ -57,4 +58,9 @@ export interface Notification {
   read: boolean; // Whether user has read this notification
   createdAt: string; // When notification was created (ISO date string)
   listingId?: string; // Optional - which listing this notification is about
+}
+
+export interface Favorite {
+  id: number;
+  listing_id: number;
 }

@@ -1,24 +1,27 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Heart, Search, Filter as FilterIcon } from 'lucide-react';
+import { ArrowLeft, Heart, Search } from 'lucide-react';
 import { Listing } from '../types';
 import { ListingCard } from './ListingCard';
 
 // Define what props this component expects
 interface FavoritesPageProps {
   listings: Listing[]; // All listings to filter favorites from
-  onFavorite: (id: string) => void; // Function to toggle favorite status
+  favoriteIds: number[];
+  onFavorite: (id: number) => void; // Function to toggle favorite status
   isAuthenticated: boolean; // Whether user is logged in
   user: { name: string; email: string } | null; // User data
 }
 
 // Favorites page component - shows all listings the user has favorited
-export function FavoritesPage({ listings, onFavorite, isAuthenticated, user }: FavoritesPageProps) {
+export function FavoritesPage({ listings, favoriteIds, onFavorite, isAuthenticated, user }: FavoritesPageProps) {
   
+  console.log('Rendering FavoritesPage with', { listings, favoriteIds, isAuthenticated, user });
   // Filter to get only favorited listings
-  const favoriteListings = useMemo(() => {
-    return listings.filter(listing => listing.isFavorite);
-  }, [listings]);
+  const favoriteListings = useMemo(
+    () => listings.filter(l => favoriteIds.includes(l.id)),
+    [listings, favoriteIds]
+  );
 
   // Separate favorites by type for statistics
   const favoriteStats = useMemo(() => {

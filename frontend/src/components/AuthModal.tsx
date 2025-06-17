@@ -9,13 +9,12 @@ interface AuthModalProps {
   onClose: () => void; // Function to call when closing modal
   mode: 'login' | 'register'; // Whether showing login or registration form
   onModeChange: (mode: 'login' | 'register') => void; // Function to switch between login/register
-  onAuthSuccess: (userData: { name: string; email: string }) => void; // Function to call on successful auth
   onLogin: (email: string, password: string) => Promise<void>; // Function to call for login
   onRegister: (name: string, email: string, password: string) => Promise<void>; // Function to call for registration
 }
 
 // Authentication modal component - popup for user login and registration
-export function AuthModal({ isOpen, onClose, mode, onModeChange, onAuthSuccess, onLogin, onRegister }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, mode, onModeChange, onLogin, onRegister }: AuthModalProps) {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' }); // Store form data in state
   const [error, setError] = useState(''); // Store validation error messages
   const [showPassword, setShowPassword] = useState(false); // Control whether password is visible or hidden

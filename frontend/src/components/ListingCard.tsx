@@ -7,7 +7,7 @@ import { Listing } from '../types';
 // Define what props this component expects
 interface ListingCardProps {
   listing: Listing; // The listing data to display
-  onFavorite: (id: string) => void; // Function to call when favorite button is clicked
+  onFavorite: (id: number) => void; // Function to call when favorite button is clicked
 }
 
 // Component that displays a single listing (car or property) as a card
@@ -100,9 +100,10 @@ export function ListingCard({ listing, onFavorite }: ListingCardProps) {
           
           {/* Favorite button (heart icon) */}
           <button
-            onClick={(e) => {
-              e.preventDefault(); // Prevent navigation when clicking favorite
-              onFavorite(listing.id); // Call favorite function with listing ID
+            aria-label="Favorite"
+            onClick={e => {
+              e.preventDefault();
+              onFavorite(listing.id);
             }}
             className={`absolute top-3 right-3 p-2 rounded-full shadow-lg transition-all duration-200 ${
               listing.isFavorite

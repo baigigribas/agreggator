@@ -1,7 +1,19 @@
 // Custom React hook for storing data in browser's local storage
 // This lets us save data that persists even when user closes the browser
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+
+// Helper to recursively convert listing ids to numbers
+function fixListingIds<T>(data: T, key: string): T {
+  if (key === 'listings' && Array.isArray(data)) {
+    return data.map((item: any) =>
+      typeof item.id === 'string'
+        ? { ...item, id: Number(item.id) }
+        : item
+    ) as T;
+  }
+  return data;
+}
 
 // Generic function that works with any data type (T represents the type)
 export function useLocalStorage<T>(key: string, initialValue: T) {
@@ -14,7 +26,9 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       
       // If item exists, parse it from JSON string back to original type
       // If not, use the initial value provided
-      return item ? JSON.parse(item) : initialValue;
+      let value = item ? JSON.parse(item) : initialValue;
+      value = fixListingIds(value, key);
+      return value;
     } catch (error) {
       // If there's an error reading from localStorage, log it and use initial value
       console.error(`Error reading localStorage key "${key}":`, error);

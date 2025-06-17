@@ -4,7 +4,7 @@ import { Listing, Filter, Notification } from '../types';
 // Sample listings data
 export const mockListings: Listing[] = [
   {
-    id: '1', // Unique identifier
+    id: 1, // Unique identifier
     title: 'BMW X5 3.0d xDrive', // Listing title
     price: 25000, // Price in the specified currency
     currency: 'EUR', // Currency code
@@ -29,7 +29,7 @@ export const mockListings: Listing[] = [
     ]
   },
   {
-    id: '2',
+    id: 2,
     title: 'Modern Apartment in Old Town',
     price: 150000,
     currency: 'EUR',
@@ -50,7 +50,7 @@ export const mockListings: Listing[] = [
     isFavorite: true // This one is marked as favorite
   },
   {
-    id: '3',
+    id: 3,
     title: 'Audi A4 2.0 TDI',
     price: 18500,
     currency: 'EUR',
@@ -71,7 +71,7 @@ export const mockListings: Listing[] = [
     isFavorite: false
   },
   {
-    id: '4',
+    id: 4,
     title: 'Family House with Garden',
     price: 280000,
     currency: 'EUR',

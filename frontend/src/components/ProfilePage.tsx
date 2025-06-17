@@ -20,12 +20,11 @@ import {
 // Define what props this component expects
 interface ProfilePageProps {
   user: { name: string; email: string; phone?: string; bio?: string; avatar?: string } | null;
-  onUpdateProfile: (userData: { name: string; email: string; phone?: string; bio?: string; avatar?: string }) => void;
   isAuthenticated: boolean;
 }
 
 // Profile page component - allows users to view and edit their profile information
-export function ProfilePage({ user, onUpdateProfile, isAuthenticated }: ProfilePageProps) {
+export function ProfilePage({ user, isAuthenticated }: ProfilePageProps) {
   // State for form data
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -223,7 +222,6 @@ export function ProfilePage({ user, onUpdateProfile, isAuthenticated }: ProfileP
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Update profile
-      onUpdateProfile(formData);
       setIsEditing(false);
       setSuccessMessage('Profile updated successfully!');
       
