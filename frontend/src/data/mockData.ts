@@ -122,13 +122,13 @@ export const mockFilters: Filter[] = [
   }
 ];
 
-// Sample notifications - alerts sent to users about new matches or price changes
+// Sample notifications - alerts sent to users about their favorited listings changes
 export const mockNotifications: Notification[] = [
   {
     id: '1',
-    title: 'New BMW X5 Match', // Notification title
-    message: 'A new BMW X5 matching your filter "BMW Cars Under 30k" has been posted', // Detailed message
-    type: 'new-listing', // Type of notification
+    title: 'Listing deleted', // Notification title
+    message: 'A listing you favorited has been deleted', // Detailed message
+    type: 'system', // Type of notification
     read: false, // Whether user has read this notification
     createdAt: '2024-01-15T10:30:00Z', // When notification was created (ISO format)
     listingId: '1' // Which listing this notification is about
