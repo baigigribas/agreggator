@@ -12,17 +12,14 @@ import { FavoritesPage } from './components/FavoritesPage';
 import { mockListings, mockNotifications } from './data/mockData';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { Listing } from './types';
-import { useEffect } from 'react';
-import { Notification } from './types';
 
-//the main component that controls the entire application
+// This is the main component that controls the entire application
 function App() {
+  // State variables - these store data that can change over time
+  
   // Store listings in browser's local storage so they persist between sessions
   // useLocalStorage is a custom hook that saves data locally
-  const [listings, setListings] = useLocalStorage<Listing[]>('listings', []);
-  useEffect(() => {
-  fetchListings().then(setListings);
-  }, []);
+  const [listings, setListings] = useLocalStorage<Listing[]>('listings', mockListings);
   
   // Track what the user is searching for
   const [searchQuery, setSearchQuery] = useState('');
