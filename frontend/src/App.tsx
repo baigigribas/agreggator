@@ -13,9 +13,12 @@ import { NotificationPanel } from './components/NotificationPanel';
 import { mockListings, mockNotifications } from './data/mockData';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { Listing, Notification } from './types';
+import { useAuth } from './hooks/useAuth';
 
 // This is the main component that controls the entire application
 function App() {
+  const { user, login, register, logout } = useAuth();
+  
   // State variables - these store data that can change over time
   
   // Store listings in browser's local storage so they persist between sessions
@@ -42,7 +45,7 @@ function App() {
 
   // Authentication state - track if user is logged in and their info
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useLocalStorage<{ name: string; email: string; phone?: string; bio?: string; avatar?: string } | null>('user', null);
+  const [userData, setUser] = useLocalStorage<{ name: string; email: string; phone?: string; bio?: string; avatar?: string } | null>('user', null);
 
   // Notification state
   const [showNotificationPanel, setShowNotificationPanel] = useState(false);
@@ -269,9 +272,9 @@ function App() {
         onShowNotifications={() => setShowNotificationPanel(true)}
         notificationCount={notifications.filter(n => !n.read).length}
         onShowAuth={handleShowAuth} // Pass function to show auth modal
-        isAuthenticated={isAuthenticated} // Pass authentication status
+        isAuthenticated={!!user} // Pass authentication status
         user={user} // Pass user data
-        onLogout={handleLogout} // Pass logout function
+        onLogout={logout} // Pass logout function
       />
 
       {/* Main content with routing */}
@@ -323,6 +326,8 @@ function App() {
         mode={authMode} // Whether showing login or register form
         onModeChange={setAuthMode} // Function to switch between login/register
         onAuthSuccess={handleAuthSuccess} // Function to handle successful authentication
+        onRegister={register}
+        onLogin={login}
       />
 
       <NotificationPanel
