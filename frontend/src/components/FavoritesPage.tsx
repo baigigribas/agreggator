@@ -153,11 +153,6 @@ export function FavoritesPage({ listings, onFavorite, isAuthenticated, user }: F
                 <Search className="h-4 w-4 mr-2" />
                 Browse Listings
               </Link>
-              
-              <button className="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">
-                <FilterIcon className="h-4 w-4 mr-2" />
-                Set Up Alerts
-              </button>
             </div>
           </div>
         ) : (
