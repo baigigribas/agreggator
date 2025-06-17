@@ -14,10 +14,8 @@ import { Listing } from './types';
 import { useEffect } from 'react';
 import { Notification } from './types';
 
-// This is the main component that controls the entire application
+//the main component that controls the entire application
 function App() {
-  // State variables - these store data that can change over time
-  
   // Store listings in browser's local storage so they persist between sessions
   // useLocalStorage is a custom hook that saves data locally
   const [listings, setListings] = useLocalStorage<Listing[]>('listings', []);

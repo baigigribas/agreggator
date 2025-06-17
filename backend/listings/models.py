@@ -37,7 +37,7 @@ class Source(models.Model):
     ]
     
     # The name of the website (like "SS.com")
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=20)
     
     # The website URL
     url = models.URLField()
@@ -54,7 +54,7 @@ class Source(models.Model):
     # When was this source added to our system?
     created_at = models.DateTimeField(auto_now_add=True)
     
-    # This makes the source appear nicely in Django admin
+    #makes the source appear nicely in Django admin
     def __str__(self):
         return f"{self.name} ({self.source_type})"
 
@@ -121,28 +121,16 @@ class Listing(models.Model):
     # === CAR-SPECIFIC INFORMATION ===
     # These fields are only filled if listing_type = 'car'
     
-    # What year was the car made?
     year = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1900), MaxValueValidator(2030)])
-    
-    # How many kilometers has it driven?
     mileage = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0)])
-    
-    # What type of fuel does it use?
     fuel_type = models.CharField(max_length=20, choices=FUEL_TYPES, null=True, blank=True)
-    
-    # What category of car? (SUV, Sedan, Hatchback, etc.)
     car_category = models.CharField(max_length=100, null=True, blank=True)
     
     # === REAL ESTATE-SPECIFIC INFORMATION ===
     # These fields are only filled if listing_type = 'real_estate'
-    
-    # How many rooms does the property have?
+
     rooms = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1)])
-    
-    # How big is the property? (in square meters)
     area = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
-    
-    # What type of property is it?
     property_type = models.CharField(max_length=50, choices=PROPERTY_TYPES, null=True, blank=True)
     
     # === SYSTEM INFORMATION ===
