@@ -9,20 +9,18 @@ import { ListingDetail } from './components/ListingDetail';
 import { AuthModal } from './components/AuthModal';
 import { ProfilePage } from './components/ProfilePage';
 import { FavoritesPage } from './components/FavoritesPage';
+import { NotificationPanel } from './components/NotificationPanel';
 import { mockListings, mockNotifications } from './data/mockData';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { Listing } from './types';
-import { useEffect } from 'react';
-import { Notification } from './types';
+import { Listing, Notification } from './types';
 
-//the main component that controls the entire application
+// This is the main component that controls the entire application
 function App() {
+  // State variables - these store data that can change over time
+  
   // Store listings in browser's local storage so they persist between sessions
   // useLocalStorage is a custom hook that saves data locally
-  const [listings, setListings] = useLocalStorage<Listing[]>('listings', []);
-  useEffect(() => {
-  fetchListings().then(setListings);
-  }, []);
+  const [listings, setListings] = useLocalStorage<Listing[]>('listings', mockListings);
   
   // Track what the user is searching for
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,6 +43,10 @@ function App() {
   // Authentication state - track if user is logged in and their info
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useLocalStorage<{ name: string; email: string; phone?: string; bio?: string; avatar?: string } | null>('user', null);
+
+  // Notification state
+  const [showNotificationPanel, setShowNotificationPanel] = useState(false);
+  const [notifications, setNotifications] = useLocalStorage<Notification[]>('notifications', mockNotifications);
 
   // Filter listings based on search, tab, and applied filters
   // useMemo means this calculation only runs when the dependencies change (optimization)
@@ -103,6 +105,11 @@ function App() {
 
   // Function to handle when user clicks the favorite button on a listing
   const handleFavorite = (id: string) => {
+    if (!isAuthenticated) {
+      setAuthMode('login');
+      setShowAuthModal(true);
+      return;
+    }
     setListings(prev =>
       // Map through all listings and toggle favorite status for the clicked one
       prev.map(listing =>
@@ -240,6 +247,18 @@ function App() {
     </>
   );
 
+  // Handler to mark a notification as read
+  const handleMarkNotificationRead = (id: string) => {
+    setNotifications(prev =>
+      prev.map(n => n.id === id ? { ...n, read: true } : n)
+    );
+  };
+
+  // Handler to clear all notifications
+  const handleClearAllNotifications = () => {
+    setNotifications([]);
+  };
+
   // Render the user interface
   return (
     <div className="min-h-screen bg-gray-50">
@@ -247,7 +266,8 @@ function App() {
       <Header
         onSearchChange={setSearchQuery} // Pass function to handle search changes
         onShowFilters={() => setShowFilters(true)} // Pass function to show filter panel
-        notificationCount={mockNotifications.filter(n => !n.read).length} // Count unread notifications
+        onShowNotifications={() => setShowNotificationPanel(true)}
+        notificationCount={notifications.filter(n => !n.read).length}
         onShowAuth={handleShowAuth} // Pass function to show auth modal
         isAuthenticated={isAuthenticated} // Pass authentication status
         user={user} // Pass user data
@@ -303,6 +323,16 @@ function App() {
         mode={authMode} // Whether showing login or register form
         onModeChange={setAuthMode} // Function to switch between login/register
         onAuthSuccess={handleAuthSuccess} // Function to handle successful authentication
+      />
+
+      <NotificationPanel
+        isOpen={showNotificationPanel}
+        notifications={notifications}
+        onClose={() => setShowNotificationPanel(false)}
+        onMarkRead={handleMarkNotificationRead}
+        onClearAll={handleClearAllNotifications}
+        onRestore={() => setNotifications(mockNotifications)}
+        user={user}
       />
     </div>
   );

@@ -12,6 +12,7 @@ interface HeaderProps {
   isAuthenticated?: boolean; // Whether user is logged in
   user?: { name: string; email: string } | null; // User data if logged in
   onLogout: () => void; // Function to handle logout
+  onShowNotifications: () => void; // Add this line
 }
 
 // Header component - the top navigation bar of the application
@@ -22,7 +23,8 @@ export function Header({
   onShowAuth,
   isAuthenticated = false,
   user = null,
-  onLogout
+  onLogout,
+  onShowNotifications,
 }: HeaderProps) {
   // State to track what user has typed in search box
   const [searchQuery, setSearchQuery] = useState('');
@@ -111,9 +113,11 @@ export function Header({
 
                 {/* Notifications button with badge */}
                 <div className="relative">
-                  <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                  <button
+                    className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                    onClick={onShowNotifications}
+                  >
                     <Bell className="h-5 w-5" />
-                    {/* Show notification count badge if there are unread notifications */}
                     {notificationCount > 0 && (
                       <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                         {notificationCount}
