@@ -20,6 +20,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    #Add API endpoints
+    # This includes the URLs from the listings app, which contains all the API views.
+    # The 'api/' prefix is used to group all API endpoints under a common path.
+    # This allows you to access the API at /api/users/, /api/sources/, etc.
+    # The include() function allows references another URLconf.
+    # The listings app's urls.py file defines the actual API endpoints.
     path("api/", include("listings.urls")),
 ]
