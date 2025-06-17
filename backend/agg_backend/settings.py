@@ -40,6 +40,14 @@ INSTALLED_APPS = [
     
     # Third-party apps (you need to install these)
     'rest_framework',                # Django REST Framework for APIs
+    'rest_framework.authtoken',
+    #enables Django REST Framework's token authentication system.
+    #What it does:
+    #It adds support for token-based authentication, where each user can be assigned a unique API token.
+    #When a user logs in (using the /api/auth/login/ endpoint), they receive a token.
+    #The frontend can send this token with API requests to prove the user's identity.
+    #The backend checks the token and authenticates the user for protected endpoints.
+    
     'corsheaders',                   # CORS headers for React frontend
     
     #custom apps
