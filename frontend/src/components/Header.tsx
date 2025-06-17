@@ -33,6 +33,7 @@ export function Header({
   // Get current location to conditionally show search and filters
   const location = useLocation();
   const isProfilePage = location.pathname === '/profile';
+  const isFavoritesPage = location.pathname === '/favorites';
 
   // Function called when user types in search box
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,7 +65,7 @@ export function Header({
           </div>
 
           {/* Search Bar - only show on listings page */}
-          {!isProfilePage && (
+          {!isProfilePage && !isFavoritesPage && (
             <div className="flex-1 max-w-2xl mx-8">
               <div className="relative">
                 {/* Search icon inside the input box */}
@@ -87,7 +88,7 @@ export function Header({
           <div className="flex items-center space-x-4">
             
             {/* Filter button - only show on listings page */}
-            {!isProfilePage && (
+            {!isProfilePage && !isFavoritesPage && (
               <button
                 onClick={onShowFilters} // Call function when clicked
                 className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
@@ -101,9 +102,12 @@ export function Header({
               // Authenticated user content
               <>
                 {/* Favorites button */}
-                <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200">
+                <Link 
+                  to="/favorites"
+                  className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                >
                   <Heart className="h-5 w-5" />
-                </button>
+                </Link>
 
                 {/* Notifications button with badge */}
                 <div className="relative">
@@ -153,9 +157,13 @@ export function Header({
                       >
                         Profile
                       </Link>
-                      <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      <Link 
+                        to="/favorites" 
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => setShowUserMenu(false)}
+                      >
                         Saved Listings
-                      </a>
+                      </Link>
                       <hr className="my-2" />
                       <button 
                         onClick={handleLogout}
