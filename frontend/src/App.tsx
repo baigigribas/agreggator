@@ -8,6 +8,7 @@ import { ListingCard } from './components/ListingCard';
 import { ListingDetail } from './components/ListingDetail';
 import { AuthModal } from './components/AuthModal';
 import { ProfilePage } from './components/ProfilePage';
+import { FavoritesPage } from './components/FavoritesPage';
 import { mockListings, mockNotifications } from './data/mockData';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { Listing } from './types';
@@ -269,6 +270,17 @@ function App() {
               user={user} 
               onUpdateProfile={handleUpdateProfile}
               isAuthenticated={isAuthenticated}
+            />
+          } 
+        />
+        <Route 
+          path="/favorites" 
+          element={
+            <FavoritesPage 
+              listings={listings}
+              onFavorite={handleFavorite}
+              isAuthenticated={isAuthenticated}
+              user={user}
             />
           } 
         />
