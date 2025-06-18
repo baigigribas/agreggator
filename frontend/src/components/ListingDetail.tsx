@@ -27,7 +27,7 @@ import { Listing } from '../types';
 
 interface ListingDetailProps {
   listings: Listing[];
-  onFavorite: (id: string) => void;
+  onFavorite: (id: number) => void;
 }
 
 export function ListingDetail({ listings, onFavorite }: ListingDetailProps) {
@@ -37,7 +37,8 @@ export function ListingDetail({ listings, onFavorite }: ListingDetailProps) {
   const [showContactInfo, setShowContactInfo] = useState(false);
 
   // Find the listing by ID
-  const listing = listings.find(l => l.id === id);
+  const listingId = Number(id)
+  const listing = listings.find(l => l.id === listingId);
 
   // If listing not found, show error
   if (!listing) {

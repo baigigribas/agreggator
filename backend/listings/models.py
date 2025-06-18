@@ -17,6 +17,10 @@ class User(AbstractUser):
     # Uses UUID instead of regular ID for better security (whatever that means)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
+    # Use email as the username field
+    username = models.EmailField(unique=True)
+    email = models.EmailField(unique=True)
+    
     # What type of user is this person?
     role = models.CharField(max_length=20, choices=USER_ROLES, default='visitor')
     
@@ -26,6 +30,10 @@ class User(AbstractUser):
     # When was this user account created and last updated?
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # Use email as the username field
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
 # Source model - represents the websites you scrape data from
 # Like SS.com, Auto24.lv, city24.lv
