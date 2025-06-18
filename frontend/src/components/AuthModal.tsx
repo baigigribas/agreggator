@@ -8,124 +8,75 @@ interface AuthModalProps {
   onClose: () => void; // Function to call when closing modal
   mode: 'login' | 'register'; // Whether showing login or registration form
   onModeChange: (mode: 'login' | 'register') => void; // Function to switch between login/register
-  onAuthSuccess: (userData: { name: string; email: string }) => void; // Function to call on successful auth
+  onLogin: (email: string, password: string) => Promise<void>; // Function to call for login
+  onRegister: (name: string, email: string, password: string) => Promise<void>; // Function to call for registration
 }
 
 // Authentication modal component - popup for user login and registration
-export function AuthModal({ isOpen, onClose, mode, onModeChange, onAuthSuccess }: AuthModalProps) {
-  
-  // Store form data in state
-  const [formData, setFormData] = useState({
-    name: '', // Full name (only used for registration)
-    email: '', // Email address
-    password: '', // Password
-    confirmPassword: '' // Password confirmation (only used for registration)
-  });
-  
-  // Control whether password is visible or hidden
-  const [showPassword, setShowPassword] = useState(false);
-  
-  // Store validation error messages
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  
-  // Loading state for form submission
-  const [isLoading, setIsLoading] = useState(false);
+export function AuthModal({ isOpen, onClose, mode, onModeChange, onLogin, onRegister }: AuthModalProps) {
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' }); // Store form data in state
+  const [error, setError] = useState(''); // Store validation error messages
+  const [showPassword, setShowPassword] = useState(false); // Control whether password is visible or hidden
+  const [isLoading, setIsLoading] = useState(false); // Loading state for form submission
 
   // Function called when user types in any input field
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target; // Get field name and new value
-    setFormData(prev => ({ ...prev, [name]: value })); // Update form data
-    
-    // Clear error for this field when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
+    setForm({ ...form, [e.target.name]: e.target.value }); // Update form data
   };
 
-  // Function to validate the form and return true if valid
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    // Check name field (only required for registration)
-    if (mode === 'register' && !formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-
-    // Check email field
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      // Use regex to check if email format is valid
-      newErrors.email = 'Email is invalid';
-    }
-
-    // Check password field
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    // Check password confirmation (only for registration)
-    if (mode === 'register' && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    setErrors(newErrors); // Update error state
-    return Object.keys(newErrors).length === 0; // Return true if no errors
+  // Function to reset form when switching modes
+  const handleModeChange = (newMode: 'login' | 'register') => {
+    setForm({ name: '', email: '', password: '', confirmPassword: '' }); // Reset form fields
+    setError(''); // Clear error message
+    onModeChange(newMode); // Switch mode
   };
 
-  // Function called when form is submitted
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent default form submission
-    
-    if (!validateForm()) {
-      return; // Stop if validation fails
+  // Function to handle login
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(''); // Clear previous errors
+
+    if (!form.email || !form.password) {
+      setError('Email and password are required');
+      return;
     }
 
     setIsLoading(true);
-
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // For demo purposes, we'll simulate successful authentication
-      // In a real app, you would make an API call to your backend here
-      const userData = {
-        name: mode === 'register' ? formData.name : 'John Doe', // Use provided name or default
-        email: formData.email
-      };
-
-      // Call the success handler with user data
-      onAuthSuccess(userData);
-
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-      });
-      setErrors({});
-      
-    } catch (error) {
-      // Handle authentication errors
-      setErrors({ general: 'Authentication failed. Please try again.' });
+      await onLogin(form.email, form.password);
+      onClose();
+    } catch (err) {
+      setError('Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Function to reset form when switching modes
-  const handleModeChange = (newMode: 'login' | 'register') => {
-    setFormData({
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: ''
-    });
-    setErrors({});
-    onModeChange(newMode);
+  // Function to handle registration
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(''); // Clear previous errors
+
+    if (!form.name || !form.email || !form.password) {
+      setError('All fields are required');
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Only send name, email, password to onRegister
+      await onRegister(form.name, form.email, form.password);
+      onClose();
+    } catch (err) {
+      setError('Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Don't render anything if modal is not open
@@ -154,14 +105,14 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange, onAuthSuccess }
           </div>
 
           {/* Show general error if exists */}
-          {errors.general && (
+          {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm">{errors.general}</p>
+              <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
 
           {/* Authentication form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={mode === 'login' ? handleLogin : handleRegister} className="space-y-4">
             
             {/* Name field - only show for registration */}
             {mode === 'register' && (
@@ -175,17 +126,17 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange, onAuthSuccess }
                   <input
                     type="text"
                     name="name"
-                    value={formData.name}
+                    value={form.name}
                     onChange={handleInputChange}
                     disabled={isLoading}
                     className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed ${
-                      errors.name ? 'border-red-500' : 'border-gray-300' // Red border if error
+                      error ? 'border-red-500' : 'border-gray-300' // Red border if error
                     }`}
                     placeholder="Enter your full name"
                   />
                 </div>
                 {/* Show error message if exists */}
-                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
               </div>
             )}
 
@@ -200,16 +151,16 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange, onAuthSuccess }
                 <input
                   type="email"
                   name="email"
-                  value={formData.email}
+                  value={form.email}
                   onChange={handleInputChange}
                   disabled={isLoading}
                   className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed ${
-                    errors.email ? 'border-red-500' : 'border-gray-300'
+                    error ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Enter your email"
                 />
               </div>
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </div>
 
             {/* Password field */}
@@ -223,11 +174,11 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange, onAuthSuccess }
                 <input
                   type={showPassword ? 'text' : 'password'} // Toggle between text and password
                   name="password"
-                  value={formData.password}
+                  value={form.password}
                   onChange={handleInputChange}
                   disabled={isLoading}
                   className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed ${
-                    errors.password ? 'border-red-500' : 'border-gray-300'
+                    error ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Enter your password"
                 />
@@ -242,7 +193,7 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange, onAuthSuccess }
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </div>
 
             {/* Confirm password field - only show for registration */}
@@ -256,16 +207,16 @@ export function AuthModal({ isOpen, onClose, mode, onModeChange, onAuthSuccess }
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="confirmPassword"
-                    value={formData.confirmPassword}
+                    value={form.confirmPassword}
                     onChange={handleInputChange}
                     disabled={isLoading}
                     className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed ${
-                      errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                      error ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Confirm your password"
                   />
                 </div>
-                {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+                {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
               </div>
             )}
 

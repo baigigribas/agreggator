@@ -13,15 +13,15 @@ import { NotificationPanel } from './components/NotificationPanel';
 import { mockListings, mockNotifications } from './data/mockData';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { Listing, Notification } from './types';
+import { useAuth } from './hooks/useAuth';
+import { useFavorites } from './hooks/useFavorites';
 
 // This is the main component that controls the entire application
 function App() {
-  // State variables - these store data that can change over time
-  
-  // Store listings in browser's local storage so they persist between sessions
-  // useLocalStorage is a custom hook that saves data locally
+  const { user, login, register, logout } = useAuth();
   const [listings, setListings] = useLocalStorage<Listing[]>('listings', mockListings);
-  
+  const { favoriteIds, toggleFavorite } = useFavorites();
+
   // Track what the user is searching for
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -41,12 +41,19 @@ function App() {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
   // Authentication state - track if user is logged in and their info
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useLocalStorage<{ name: string; email: string; phone?: string; bio?: string; avatar?: string } | null>('user', null);
+  const isAuthenticated = !!user && (user.role === 'registered' || user.role === 'admin');
 
   // Notification state
   const [showNotificationPanel, setShowNotificationPanel] = useState(false);
   const [notifications, setNotifications] = useLocalStorage<Notification[]>('notifications', mockNotifications);
+
+  // Mark listings as favorite
+  const listingsWithFavorite = useMemo(() => {
+    return listings.map(listing => ({
+      ...listing,
+      isFavorite: favoriteIds.includes(listing.id),
+    }));
+  }, [listings, favoriteIds]);
 
   // Filter listings based on search, tab, and applied filters
   // useMemo means this calculation only runs when the dependencies change (optimization)
@@ -102,50 +109,6 @@ function App() {
 
     return filtered; // Return the filtered results
   }, [listings, searchQuery, activeTab, appliedFilters]); // Recalculate when these values change
-
-  // Function to handle when user clicks the favorite button on a listing
-  const handleFavorite = (id: string) => {
-    if (!isAuthenticated) {
-      setAuthMode('login');
-      setShowAuthModal(true);
-      return;
-    }
-    setListings(prev =>
-      // Map through all listings and toggle favorite status for the clicked one
-      prev.map(listing =>
-        listing.id === id ? { ...listing, isFavorite: !listing.isFavorite } : listing
-      )
-    );
-  };
-
-  // Function to handle when user applies filters
-  const handleApplyFilters = (filters: any) => {
-    setAppliedFilters(filters);
-  };
-
-  // Function to show authentication modal
-  const handleShowAuth = (mode: 'login' | 'register') => {
-    setAuthMode(mode);
-    setShowAuthModal(true);
-  };
-
-  // Function to handle successful authentication
-  const handleAuthSuccess = (userData: { name: string; email: string }) => {
-    setIsAuthenticated(true);
-    setUser(userData);
-    setShowAuthModal(false);
-  };
-
-  // Function to handle logout
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
-  };
-
-  // Function to update user profile
-  const handleUpdateProfile = (updatedUser: { name: string; email: string; phone?: string; bio?: string; avatar?: string }) => {
-    setUser(updatedUser);
-  };
 
   // Calculate dashboard statistics
   // useMemo optimizes this so it only recalculates when listings change
@@ -234,13 +197,17 @@ function App() {
         ) : (
           // Show listings in a responsive grid
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredListings.map(listing => (
-              <ListingCard
-                key={listing.id} // Unique key for React rendering
-                listing={listing} // Pass listing data to card
-                onFavorite={handleFavorite} // Pass favorite handler function
-              />
-            ))}
+            {filteredListings.map(listing => {
+              const listingWithFavorite = listingsWithFavorite.find(l => l.id === listing.id) || listing;
+              return (
+                <ListingCard
+                  key={listing.id}
+                  listing={listingWithFavorite}
+                  onFavorite={toggleFavorite}
+                  onHide={hideListing}
+                />
+              );
+            })}
           </div>
         )}
       </main>
@@ -259,6 +226,24 @@ function App() {
     setNotifications([]);
   };
 
+  function handleApplyFilters(filters: any): void {
+    setAppliedFilters(filters);
+    setShowFilters(false);
+  }
+
+  function handleShowAuth(mode: 'login' | 'register'): void {
+    setAuthMode(mode);
+    setShowAuthModal(true);
+  }
+
+  const hideListing = (id: number, hidden: boolean) => {
+    setListings(prev =>
+      prev.map(listing =>
+        listing.id === id ? { ...listing, hidden } : listing
+      )
+    );
+  };
+
   // Render the user interface
   return (
     <div className="min-h-screen bg-gray-50">
@@ -271,7 +256,7 @@ function App() {
         onShowAuth={handleShowAuth} // Pass function to show auth modal
         isAuthenticated={isAuthenticated} // Pass authentication status
         user={user} // Pass user data
-        onLogout={handleLogout} // Pass logout function
+        onLogout={logout} // Pass logout function
       />
 
       {/* Main content with routing */}
@@ -281,8 +266,8 @@ function App() {
           path="/listing/:id" 
           element={
             <ListingDetail 
-              listings={listings} 
-              onFavorite={handleFavorite}
+              listings={listingsWithFavorite} 
+              onFavorite={toggleFavorite}
             />
           } 
         />
@@ -291,7 +276,6 @@ function App() {
           element={
             <ProfilePage 
               user={user} 
-              onUpdateProfile={handleUpdateProfile}
               isAuthenticated={isAuthenticated}
             />
           } 
@@ -300,8 +284,10 @@ function App() {
           path="/favorites" 
           element={
             <FavoritesPage 
-              listings={listings}
-              onFavorite={handleFavorite}
+              listings={listingsWithFavorite} 
+              favoriteIds={favoriteIds}
+              onFavorite={toggleFavorite}
+              onHide={hideListing}
               isAuthenticated={isAuthenticated}
               user={user}
             />
@@ -322,7 +308,8 @@ function App() {
         onClose={() => setShowAuthModal(false)} // Function to close modal
         mode={authMode} // Whether showing login or register form
         onModeChange={setAuthMode} // Function to switch between login/register
-        onAuthSuccess={handleAuthSuccess} // Function to handle successful authentication
+        onRegister={register}
+        onLogin={login}
       />
 
       <NotificationPanel
