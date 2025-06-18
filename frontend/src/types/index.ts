@@ -30,6 +30,7 @@ export interface Listing {
     price: number; // Previous price
     date: string; // When price was this amount
   }>;
+  hidden?: boolean; // Optional - whether the listing is hidden
 }
 
 // Filter structure - represents a saved search configuration

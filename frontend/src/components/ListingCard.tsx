@@ -3,16 +3,19 @@ import { Link } from 'react-router-dom';
 // Import icons for displaying listing information
 import { Heart, MapPin, Calendar, Gauge, Fuel, Settings, Home, Bed, Square } from 'lucide-react';
 import { Listing } from '../types';
+import { useAuth } from '../hooks/useAuth';
 
 // Define what props this component expects
 interface ListingCardProps {
   listing: Listing; // The listing data to display
   onFavorite: (id: number) => void; // Function to call when favorite button is clicked
+  onHide: (id: number, hidden: boolean) => void; // Function to call when hide/unhide button is clicked
 }
 
 // Component that displays a single listing (car or property) as a card
-export function ListingCard({ listing, onFavorite }: ListingCardProps) {
-  
+export function ListingCard({ listing, onFavorite, onHide }: ListingCardProps) {
+  const { user } = useAuth();
+
   // Function to format price with proper currency symbol and formatting
   const formatPrice = (price: number, currency: string) => {
     return new Intl.NumberFormat('lv-LV', {
@@ -86,6 +89,7 @@ export function ListingCard({ listing, onFavorite }: ListingCardProps) {
 
   return (
     // Card container with hover effects - wrapped in Link for navigation
+    console.log(user?.role),
     <Link to={`/listing/${listing.id}`} className="block">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
         
@@ -168,6 +172,22 @@ export function ListingCard({ listing, onFavorite }: ListingCardProps) {
           </div>
         </div>
       </div>
+
+      {/* Admin controls - show hide/unhide button if user is admin */}
+      {user?.role === 'admin' && (
+        <div className="mt-2">
+          <button
+            onClick={() => onHide(listing.id, !listing.hidden)}
+            className={`px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 ${
+              listing.hidden
+                ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                : 'bg-red-100 text-red-800 hover:bg-red-200'
+            }`}
+          >
+            {listing.hidden ? 'Unhide' : 'Hide'}
+          </button>
+        </div>
+      )}
     </Link>
   );
 }

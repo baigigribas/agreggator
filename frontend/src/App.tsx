@@ -204,6 +204,7 @@ function App() {
                   key={listing.id}
                   listing={listingWithFavorite}
                   onFavorite={toggleFavorite}
+                  onHide={hideListing}
                 />
               );
             })}
@@ -234,6 +235,14 @@ function App() {
     setAuthMode(mode);
     setShowAuthModal(true);
   }
+
+  const hideListing = (id: number, hidden: boolean) => {
+    setListings(prev =>
+      prev.map(listing =>
+        listing.id === id ? { ...listing, hidden } : listing
+      )
+    );
+  };
 
   // Render the user interface
   return (
@@ -278,6 +287,7 @@ function App() {
               listings={listingsWithFavorite} 
               favoriteIds={favoriteIds}
               onFavorite={toggleFavorite}
+              onHide={hideListing}
               isAuthenticated={isAuthenticated}
               user={user}
             />

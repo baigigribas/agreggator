@@ -98,6 +98,19 @@ app.get('/api/listings/:id', (req, res) => {
   });
 });
 
+// Hide or unhide a listing (admin only)
+app.put('/api/listings/:id/hide', (req, res) => {
+  const { hidden } = req.body; // expects { hidden: 1 } or { hidden: 0 }
+  db.run(
+    'UPDATE listings SET hidden = ? WHERE id = ?',
+    [hidden, req.params.id],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ updated: this.changes });
+    }
+  );
+});
+
 // --- LISTING IMAGES ---
 
 // Add image to listing

@@ -9,13 +9,14 @@ interface FavoritesPageProps {
   listings: Listing[]; // All listings to filter favorites from
   favoriteIds: number[];
   onFavorite: (id: number) => void; // Function to toggle favorite status
+  onHide: (id: number, hidden: boolean) => void; 
   isAuthenticated: boolean; // Whether user is logged in
   user: { name: string; email: string } | null; // User data
 }
 
 // Favorites page component - shows all listings the user has favorited
-export function FavoritesPage({ listings, favoriteIds, onFavorite, isAuthenticated, user }: FavoritesPageProps) {
-  
+export function FavoritesPage({ listings, favoriteIds, onFavorite, onHide, isAuthenticated, user }: FavoritesPageProps) {
+
   console.log('Rendering FavoritesPage with', { listings, favoriteIds, isAuthenticated, user });
   // Filter to get only favorited listings
   const favoriteListings = useMemo(
@@ -185,6 +186,7 @@ export function FavoritesPage({ listings, favoriteIds, onFavorite, isAuthenticat
                   key={listing.id}
                   listing={listing}
                   onFavorite={onFavorite}
+                  onHide={onHide}
                 />
               ))}
             </div>

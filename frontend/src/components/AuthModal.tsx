@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 // Import icons for the authentication form
 import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
 
 // Define what props this component expects
 interface AuthModalProps {
