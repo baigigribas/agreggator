@@ -38,7 +38,8 @@ This is a full-stack web application that serves as a one-stop solution for find
 ### Backend:
 - **Django 5.2**: High-level Python web framework for rapid development
 - **Django REST Framework**: Powerful toolkit for building Web APIs
-- **PostgreSQL**: Advanced open-source relational database
+- **SQLite3**: Advanced open-source relational database
+- **Node.js**: JavaScript runtime environment that lets developers create servers, web apps, command line tools and scripts
 - **Python 3.12**: Modern Python runtime with excellent performance
 
 ### Development Tools:
@@ -107,7 +108,6 @@ This is a full-stack web application that serves as a one-stop solution for find
 - Real-time search across all listing content
 - Category-specific filters (cars vs. real estate)
 - Price range, location, and specification filtering
-- Saved filter preferences
 
 ### 4. Favorites System
 - Save listings for later viewing
@@ -125,7 +125,6 @@ This is a full-stack web application that serves as a one-stop solution for find
 
 ### Core Models:
 - **User**: Extended Django user model with roles and preferences
-- **Source**: Website sources for data aggregation
 - **Listing**: Main listing model with flexible specifications
 - **Filter**: User-defined search filters
 - **Favorite**: User-listing relationships
@@ -153,7 +152,7 @@ This is a full-stack web application that serves as a one-stop solution for find
 ### Prerequisites:
 - Node.js 18+ and npm
 - Python 3.12+
-- PostgreSQL 16+
+- SQLite 3
 
 ### Frontend Setup:
 ```bash
@@ -170,13 +169,6 @@ python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
-
-### Database Configuration:
-The application uses PostgreSQL with the following configuration:
-- Database: `content`
-- User: `lunerd`
-- Host: `localhost`
-- Port: `5432`
 
 ## User Roles & Permissions
 
@@ -199,49 +191,12 @@ The application uses PostgreSQL with the following configuration:
 - User management
 - System administration
 
-## Current Features
-
-✅ **Complete Frontend Interface**: Modern, responsive React application
-✅ **User Authentication**: Registration, login, and profile management
-✅ **Listing Browser**: Comprehensive listing display with filtering
-✅ **Favorites System**: Save and manage favorite listings
-✅ **Search Functionality**: Real-time search across all content
-✅ **Dashboard Analytics**: Statistics and user activity tracking
-✅ **Mobile Responsive**: Optimized for all device sizes
-✅ **Database Integration**: Full PostgreSQL backend with Django
-✅ **API Layer**: RESTful API for frontend-backend communication
-✅ **Admin Interface**: Django admin for system management
-
 ## Data Sources
 
 The application aggregates listings from:
 - **ss.com**: Latvia's largest classified ads website
 - **city24.lv**: Real estate focused platform
-- **auto24.lv**: Automotive marketplace
-
-## Performance & Scalability
-
-- **Database Indexing**: Optimized queries for fast search and filtering
-- **Pagination**: Efficient data loading with 20 items per page
-- **Caching**: Strategic caching for improved response times
-- **Responsive Design**: Optimized for various screen sizes and devices
-
-## Security Features
-
-- **CSRF Protection**: Cross-site request forgery prevention
-- **CORS Configuration**: Secure cross-origin resource sharing
-- **Password Validation**: Strong password requirements
-- **SQL Injection Prevention**: Parameterized queries and ORM usage
-- **Authentication Tokens**: Secure API authentication
-
-## Future Enhancements
-
-- Real-time notifications via WebSocket
-- Advanced analytics and reporting
-- Mobile application development
-- Machine learning for price predictions
-- Integration with additional data sources
-- Multi-language support
+- **auto24.lv**: Automotive marketplac
 
 ## License
 
