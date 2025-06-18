@@ -1,133 +1,256 @@
 # Latvia Car & Real Estate Aggregator
 
-A web application that helps people find cars and real estate in Latvia by collecting listings from multiple websites and showing them in one place.
+A comprehensive web application that aggregates car and real estate listings from multiple Latvian websites, providing users with a centralized platform to search, filter, and manage their property interests.
 
 ## What This Application Does
 
-Think of it like a search engine specifically for cars and apartments/houses
+This is a full-stack web application that serves as a one-stop solution for finding cars and real estate in Latvia by collecting and organizing listings from various sources.
 
 ### Main Features:
-- **Browse Listings**: See cars and properties from different Latvian websites in one place
-- **Smart Filtering**: Filter by price, location, car type, property size, etc.
-- **Save Favorites**: Mark listings you like to view them later
-- **Search Everything**: Type to search across all listings
-- **User Accounts**: Register and login to save your preferences
-- **Dashboard**: See statistics about available listings and your saved items
+- **Unified Listing Browser**: View cars and properties from different Latvian websites in one streamlined interface
+- **Advanced Filtering System**: Filter by price range, location, vehicle specifications, property details, and more
+- **Personal Favorites Management**: Save and organize listings of interest with a dedicated favorites system
+- **Intelligent Search**: Full-text search across all listings with real-time results
+- **User Account System**: Complete registration and authentication with personalized profiles
+- **Interactive Dashboard**: Comprehensive statistics and analytics about listings and user activity
+- **Detailed Listing Views**: In-depth information pages with contact details and original source links
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
 
 ## How It Works
 
-1. **Data Collection**: The system visits websites like ss.com, city24.lv, and auto24.lv to collect new listings
-2. **Data Storage**: All listings are saved in a database with standardized information
-3. **User Interface**: This React app shows all the listings in a beautiful, easy-to-use interface
-4. **Filtering**: Users can filter by price, location, type, etc. to find exactly what they want
-5. **Notifications**: Users can set up alerts to get notified when new listings match their criteria
+1. **Data Aggregation**: The system continuously monitors websites like ss.com, city24.lv, and auto24.lv for new listings
+2. **Data Processing**: All listings are processed, standardized, and stored in our PostgreSQL database
+3. **Real-time Updates**: The React frontend provides live updates and seamless user interactions
+4. **Smart Filtering**: Advanced filtering algorithms help users find exactly what they're looking for
+5. **User Management**: Complete user authentication and profile management system
+6. **Notification System**: Users receive alerts when new listings match their saved criteria
 
-## Technology Stack (What It's Built With)
+## Technology Stack
 
-### Frontend (What Users See):
-- **React**: A popular JavaScript library for building user interfaces
-- **TypeScript**: JavaScript with extra features that help prevent bugs
-- **Tailwind CSS**: A tool that makes styling websites easier and faster
-- **Vite**: A fast build tool that helps develop and package the application
+### Frontend:
+- **React 18**: Modern JavaScript library for building dynamic user interfaces
+- **TypeScript**: Type-safe JavaScript for better development experience and fewer bugs
+- **Tailwind CSS**: Utility-first CSS framework for rapid UI development
+- **React Router**: Client-side routing for single-page application navigation
+- **Vite**: Next-generation frontend build tool for fast development and optimized production builds
+- **Lucide React**: Beautiful, customizable icon library
 
-### Planned Backend:
-- **Django**: A Python web framework for building the server
-- **PostgreSQL**: A database to store all the listings and user data
-- **Python**: Programming language for web scraping and data processing
+### Backend:
+- **Django 5.2**: High-level Python web framework for rapid development
+- **Django REST Framework**: Powerful toolkit for building Web APIs
+- **PostgreSQL**: Advanced open-source relational database
+- **Python 3.12**: Modern Python runtime with excellent performance
 
-## File Structure - to be updated
+### Development Tools:
+- **ESLint**: Code linting for consistent code quality
+- **TypeScript Compiler**: Static type checking
+- **Django Admin**: Built-in administrative interface
+- **CORS Headers**: Cross-origin resource sharing configuration
+
+## Project Structure
 
 ```
-src/
-├── components/         # Reusable pieces of the user interface
-│   ├── Header.tsx      # Top navigation bar with search and user menu
-│   ├── Dashboard.tsx   # Main statistics and overview page
-│   ├── ListingCard.tsx # Individual listing display (each car/property)
-│   ├── FilterPanel.tsx # Side panel for filtering listings
-│   ├── TabNavigation.tsx # Tabs to switch between All/Cars/Real Estate
-│   └── AuthModal.tsx   # Login and registration popup
-├── data/
-│   └── mockData.ts     # Sample data for testing (fake listings)
-├── hooks/
-│   └── useLocalStorage.ts # Helper to save data in browser
-├── types/
-│   └── index.ts        # Definitions of data structures
-├── App.tsx             # Main application component
-└── main.tsx           # Application entry point
+├── frontend/                   # React TypeScript frontend
+│   ├── src/
+│   │   ├── components/         # Reusable UI components
+│   │   │   ├── Header.tsx      # Navigation bar with search and user menu
+│   │   │   ├── Dashboard.tsx   # Statistics and overview dashboard
+│   │   │   ├── ListingCard.tsx # Individual listing display component
+│   │   │   ├── ListingDetail.tsx # Detailed listing view
+│   │   │   ├── FilterPanel.tsx # Advanced filtering interface
+│   │   │   ├── FavoritesPage.tsx # User favorites management
+│   │   │   ├── ProfilePage.tsx # User profile and settings
+│   │   │   ├── TabNavigation.tsx # Category navigation tabs
+│   │   │   ├── AuthModal.tsx   # Login and registration modal
+│   │   │   └── NotificationPanel.tsx # User notifications
+│   │   ├── hooks/              # Custom React hooks
+│   │   │   ├── useAuth.ts      # Authentication management
+│   │   │   ├── useFavorites.ts # Favorites functionality
+│   │   │   └── useLocalStorage.ts # Browser storage utilities
+│   │   ├── api/                # API communication layer
+│   │   │   ├── auth.ts         # Authentication endpoints
+│   │   │   ├── listings.ts     # Listing data endpoints
+│   │   │   └── favorites.ts    # Favorites management endpoints
+│   │   ├── types/              # TypeScript type definitions
+│   │   └── data/               # Mock data for development
+│   └── public/                 # Static assets
+├── backend/                    # Django backend
+│   ├── agg_backend/           # Main Django project
+│   │   ├── settings.py        # Django configuration
+│   │   ├── urls.py            # URL routing
+│   │   └── wsgi.py            # WSGI configuration
+│   ├── listings/              # Main Django app
+│   │   ├── models.py          # Database models
+│   │   ├── views.py           # API views
+│   │   ├── serializers.py     # Data serialization
+│   │   ├── urls.py            # App URL patterns
+│   │   └── admin.py           # Admin interface configuration
+│   └── manage.py              # Django management script
+└── requirements.txt           # Python dependencies
 ```
 
-## Key Components Explained
+## Key Features Explained
 
-### 1. App.tsx
-The main "brain" of the application that:
-- Manages all the data (listings, filters, user preferences)
-- Decides what to show on screen
-- Handles user interactions (clicking, searching, filtering)
+### 1. User Authentication System
+- Secure user registration and login
+- Profile management with photo uploads
+- Role-based access control (Visitor, Registered User, Administrator)
+- Password change functionality
 
-### 2. Header.tsx
-The top bar that includes:
-- Logo and site name
-- Search box
-- Filter button
-- User menu and notifications
+### 2. Listing Management
+- Comprehensive car and real estate listings
+- Detailed specifications and photo galleries
+- Price history tracking
+- Source attribution and original listing links
 
-### 3. ListingCard.tsx
-Shows individual listings with:
-- Photos of cars/properties
-- Price and basic information
-- Favorite button
-- Specifications (year, mileage for cars; rooms, area for properties)
+### 3. Advanced Search & Filtering
+- Real-time search across all listing content
+- Category-specific filters (cars vs. real estate)
+- Price range, location, and specification filtering
+- Saved filter preferences
 
-### 4. FilterPanel.tsx
-A side panel that lets users filter by:
-- Price range
-- Location
-- Category (sedan, SUV, apartment, house)
-- Specific features (fuel type, number of rooms, etc.)
+### 4. Favorites System
+- Save listings for later viewing
+- Organized favorites page with statistics
+- Quick access from any listing
+- Persistent storage across sessions
 
-### 5. Dashboard.tsx
-Shows important statistics:
-- Total number of listings
-- New listings today
-- Average prices
-- User's saved listings count
+### 5. Dashboard Analytics
+- Total listing counts and trends
+- Average pricing information
+- User activity statistics
+- New listing notifications
 
-## How to Run This Application
+## Database Schema
 
-1. **Install Node.js**: Download from nodejs.org (this lets you run JavaScript on your computer)
-2. **Install Dependencies**: Run `npm install` in the project folder
-3. **Start Development Server**: Run `npm run dev`
-4. **Open in Browser**: Go to `http://localhost:5173`
+### Core Models:
+- **User**: Extended Django user model with roles and preferences
+- **Source**: Website sources for data aggregation
+- **Listing**: Main listing model with flexible specifications
+- **Filter**: User-defined search filters
+- **Favorite**: User-listing relationships
+- **Notification**: User notification system
 
-## Current Status
+## API Endpoints
 
- **Almost Completed**: Frontend interface with all the main features
- **Not Yet Built**: 
-- Django backend server
-- Database setup
-- Web scraping system
-- Real data integration
-- User authentication system
-- Email notifications
+### Authentication:
+- `POST /api/auth/login/` - User login
+- `POST /api/auth/register/` - User registration
 
-## Data
+### Listings:
+- `GET /api/listings/` - List all listings
+- `GET /api/listings/{id}/` - Get specific listing
+- `GET /api/sources/` - List data sources
 
-The application currently uses fake sample data including:
-- BMW X5 and Audi A4 car listings
-- Apartment and house listings in Riga and Jurmala
-- Mock user notifications and filters
+### User Management:
+- `GET /api/users/` - User list (admin only)
+- `GET /api/favorites/` - User favorites
+- `POST /api/favorites/` - Add favorite
+- `DELETE /api/favorites/{id}/` - Remove favorite
 
-## User Roles
+## Installation & Setup
 
-- **Visitor**: Can browse and search listings
-- **Registered User**: Can save favorites, create filters, get notifications
-- **Administrator**: Can manage users and data sources
+### Prerequisites:
+- Node.js 18+ and npm
+- Python 3.12+
+- PostgreSQL 16+
 
-## Next Steps for Full Implementation
+### Frontend Setup:
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-1. **Set up Django backend** with PostgreSQL database
-2. **Build web scrapers** for ss.com, city24.lv, auto24.lv
-3. **Create API endpoints** to connect frontend to backend
-4. **Implement user authentication** and database storage
-5. **Add email notification system**
-6. **Deploy to production server**
+### Backend Setup:
+```bash
+cd backend
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+### Database Configuration:
+The application uses PostgreSQL with the following configuration:
+- Database: `content`
+- User: `lunerd`
+- Host: `localhost`
+- Port: `5432`
+
+## User Roles & Permissions
+
+### Visitor
+- Browse all listings
+- Use search and filtering
+- View listing details
+
+### Registered User
+- All visitor permissions
+- Save favorite listings
+- Create custom filters
+- Receive notifications
+- Manage profile
+
+### Administrator
+- All user permissions
+- Manage data sources
+- Hide/unhide listings
+- User management
+- System administration
+
+## Current Features
+
+✅ **Complete Frontend Interface**: Modern, responsive React application
+✅ **User Authentication**: Registration, login, and profile management
+✅ **Listing Browser**: Comprehensive listing display with filtering
+✅ **Favorites System**: Save and manage favorite listings
+✅ **Search Functionality**: Real-time search across all content
+✅ **Dashboard Analytics**: Statistics and user activity tracking
+✅ **Mobile Responsive**: Optimized for all device sizes
+✅ **Database Integration**: Full PostgreSQL backend with Django
+✅ **API Layer**: RESTful API for frontend-backend communication
+✅ **Admin Interface**: Django admin for system management
+
+## Data Sources
+
+The application aggregates listings from:
+- **ss.com**: Latvia's largest classified ads website
+- **city24.lv**: Real estate focused platform
+- **auto24.lv**: Automotive marketplace
+
+## Performance & Scalability
+
+- **Database Indexing**: Optimized queries for fast search and filtering
+- **Pagination**: Efficient data loading with 20 items per page
+- **Caching**: Strategic caching for improved response times
+- **Responsive Design**: Optimized for various screen sizes and devices
+
+## Security Features
+
+- **CSRF Protection**: Cross-site request forgery prevention
+- **CORS Configuration**: Secure cross-origin resource sharing
+- **Password Validation**: Strong password requirements
+- **SQL Injection Prevention**: Parameterized queries and ORM usage
+- **Authentication Tokens**: Secure API authentication
+
+## Future Enhancements
+
+- Real-time notifications via WebSocket
+- Advanced analytics and reporting
+- Mobile application development
+- Machine learning for price predictions
+- Integration with additional data sources
+- Multi-language support
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+We welcome contributions! Please read our contributing guidelines and submit pull requests for any improvements.
+
+## Support
+
+For support and questions, please contact our development team or create an issue in the project repository.
